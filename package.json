@@ -5,7 +5,12 @@
   "main": "app.js",
   "author": "Connor Sears",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "install": "electron-rebuild"
+  },
+  "devDependencies": {
+    "electron": "^1.4.1",
+    "electron-rebuild": "^1.4.0"
   },
   "dependencies": {
     "crc": "^3.4.4",
