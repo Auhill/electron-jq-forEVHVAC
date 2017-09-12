@@ -1,4 +1,21 @@
 const crc=require('crc');
+const serialport = require('serialport')
+
+//serial port
+serialport.list((err, ports) => {
+  console.log('ports', ports);
+  if (err) {
+    document.getElementById('error').textContent = err.message
+    return
+  } else {
+    document.getElementById('error').textContent = ''
+  }
+
+  if (ports.length === 0) {
+    document.getElementById('error').textContent = 'No ports discovered'
+}
+
+//this is for testing
 $("#e1label").click(function() {
     alert( "Handler for btndiv1 .click() called." );
     $("#e1label").text("clicked!");
@@ -8,6 +25,8 @@ $("button").click(function(e) {
 	// alert(b_id)
 	byte1 = get_byte1(b_id);
 	message = get_message(byte1);
+	alert(message.length)
+	ports.forEach(port => message.write(port))
 });
 
 function get_message(byte1){
@@ -31,7 +50,7 @@ function get_byte1(b_id){
 	'd1r','d2r','d3r','d4r','d5r'
 	]
 	id_index = id_array.indexOf(b_id)
-	console.log(id_index)
+
 	if (id_index >= 0){
 		event_order = id_index+1;
 		byte1 = new Buffer(event_order.toString(),'hex');
