@@ -1,7 +1,7 @@
 const crc=require('crc');
 const serialport = require('serialport')
 
-//serial port
+serial port
 serialport.list((err, ports) => {
   console.log('ports', ports);
   if (err) {
@@ -15,19 +15,12 @@ serialport.list((err, ports) => {
     document.getElementById('error').textContent = 'No ports discovered'
 }
 
-//this function is for testing
-$("#e1label").click(function() {
-    alert( "Handler for btndiv1 .click() called." );
-    $("#e1label").text("clicked!");
-});  
-
 //on button click
 $("button").click(function(e) {
 	var b_id = $(e.target).attr('id'); 
-	// alert(b_id)
 	let byte1 = get_byte1(b_id);
 	let message = get_message(byte1);
-	alert(message.length)
+	alert(message.toString('hex'))
 	ports.forEach(port => message.write(port))
 });
 
@@ -38,7 +31,11 @@ function get_message(byte1){
 	const byte0 = new Buffer('11','hex');
 	const byte234 = new Buffer('00','hex');
 	const byte6 = new Buffer('0a','hex');
-	let byte5 = crc.crc8(byte0,byte1,byte234,byte234,byte234);
+	numcrc = crc.crc8(byte0,byte1,byte234,byte234,byte234)
+	//always equal 77: wrong usage for crc8 module!
+	let byte5 = new Buffer(numcrc.toString(16),'hex');
+
+	// alert(byte5.toString('hex'))
 	let message = Buffer.concat([byte0,byte1,byte234,byte234,byte234,byte5,byte6]);
 	return message;
 }
@@ -56,7 +53,7 @@ function get_byte1(b_id){
 	let id_index = id_array.indexOf(b_id)
 
 	const label_list = [
-	'l_e1','l_e2','l_s1','l_s2','l_s3','l_d1','l_d2','l_d3','l_d4','ld5'
+	'l_e1','l_e2','l_s1','l_s2','l_s3','l_d1','l_d2','l_d3','l_d4','l_d5'
 	]
 
 	//change the label text
@@ -84,13 +81,52 @@ function get_byte1(b_id){
 		}else{
 			alert("index out of range!")
 		}
-	$("#"+label_list[label_index]).text(id_array[id_index]+"clicked!");
 
+	info_array = 
+	[
+		'EXV1正转1步',
+		'EXV1反转1步',
+		'EXV1正转多步',
+		'EXV1反转多步',
+		'EXV2正转1步',
+		'EXV2反转1步	',
+		'EXV2正转多步	',
+		'EXV2反转多步	',
+		'SOV1开	',
+		'SOV1关	',
+		'SOV2开',
+		'SOV2关',
+		'SOV3开',
+		'SOV4关',
+		'Reset EXV1	',
+		'Reset EXV2	',
+		'Damper1正转1步	',
+		'Damper1反转1步	',
+		'Damper2正转1步	',
+		'Damper2反转1步	',
+		'Damper3正转1步	',
+		'Damper3反转1步	',
+		'Damper4正转1步	',
+		'Damper4反转1步	',
+		'Damper5正转1步	',
+		'Damper5反转1步	',
+		'Damper1 Reset	',
+		'Damper2 Reset	',
+		'Damper3 Reset	',
+		'Damper4 Reset	',
+		'Damper5 Reset'
+	]
+	$("#"+label_list[label_index]).text('   '+info_array[id_index]);
 		let event_order = id_index+1;
-		let byte1 = new Buffer(event_order.toString(),'hex');
+		order_str = event_order.toString();
+		if (order_str.length==1){
+			order_str = '0' + order_str;
+		}
+		var byte1 = new Buffer(order_str,'hex');
+		// alert(byte1.toString('hex'))
 	}else{
 		alert('id not found!');
-		let byte1 = new Buffer('00','hex');
+		var byte1 = new Buffer('00','hex');
 	}
 	return byte1;
 }
