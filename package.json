@@ -8,6 +8,8 @@
     "start": "electron ."
   },
   "dependencies": {
-    "electron": "^1.7.6"
+    "crc": "^3.4.4",
+    "electron": "^1.7.6",
+    "serialport": "^5.0.0"
   }
 }
