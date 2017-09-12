@@ -29,6 +29,8 @@ $("button").click(function(e) {
 	ports.forEach(port => message.write(port))
 });
 
+setInterval(send_clock(),500)
+
 function get_message(byte1){
 	//construct Bytes for Click Events
 	byte0 = new Buffer('11','hex');
@@ -51,7 +53,37 @@ function get_byte1(b_id){
 	]
 	id_index = id_array.indexOf(b_id)
 
+	label_list = [
+	'l_e1','l_e2','l_s1','l_s2','l_s3','l_d1','l_d2','l_d3','l_d4','ld5'
+	]
+
 	if (id_index >= 0){
+		if ((id_index<4)||(id_index==14)){
+			label_index = 0
+		}else if((id_index<8)||(id_index==15)){
+			label_index = 1
+		}else if(id_index<10){
+			label_index = 2
+		}else if(id_index<12){
+			label_index = 3
+		}else if(id_index<14){
+			label_index = 4
+		}else if((id_index<18)||(id_index==26)){
+			label_index = 5
+		}else if((id_index<20)||(id_index==27)){
+			label_index = 6
+		}else if((id_index<22)||(id_index==28)){
+			label_index = 7
+		}else if((id_index<24)||(id_index==29)){
+			label_index = 8
+		}else if((id_index<26)||(id_index==30)){
+			label_index = 9
+		}else{
+			alert("index out of range!")
+		}
+	$("#"+label_list[label_index]).text(id_array[id_index]+"clicked!");
+
+
 		event_order = id_index+1;
 		byte1 = new Buffer(event_order.toString(),'hex');
 	}else{
@@ -59,4 +91,12 @@ function get_byte1(b_id){
 		byte1 = new Buffer('00','hex');
 	}
 	return byte1;
+}
+
+function send_clock(){
+	byte0 = new Buffer('13','hex');
+	byte6 = new Buffer('0a','hex');
+	byte15 = new Buffer('00','hex');	
+	message = Buffer.concat([byte0,byte15,byte15,byte15,byte15,byte15,byte6]);
+	ports.forEach(port => message.write(port))
 }
