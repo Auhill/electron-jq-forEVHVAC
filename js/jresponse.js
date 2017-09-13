@@ -1,42 +1,47 @@
 const crc=require('crc');
-const serialport = require('serialport')
+// const serialport = require('serialport')
 
-serial port
-serialport.list((err, ports) => {
-  console.log('ports', ports);
-  if (err) {
-    document.getElementById('error').textContent = err.message
-    return
-  } else {
-    document.getElementById('error').textContent = ''
-  }
+// serial port
+// serialport.list((err, ports) => {
+//   console.log('ports', ports);
+//   if (err) {
+//     document.getElementById('error').textContent = err.message
+//     return
+//   } else {
+//     document.getElementById('error').textContent = ''
+//   }
 
-  if (ports.length === 0) {
-    document.getElementById('error').textContent = 'No ports discovered'
-}
+//   if (ports.length === 0) {
+//     document.getElementById('error').textContent = 'No ports discovered'
+// }
 
 //on button click
 $("button").click(function(e) {
 	var b_id = $(e.target).attr('id'); 
 	let byte1 = get_byte1(b_id);
 	let message = get_message(byte1);
-	alert(message.toString('hex'))
+	alert(message.toString('hex'));
 	ports.forEach(port => message.write(port))
 });
 
-setInterval(send_clock(),500)
+// setInterval(send_clock(),500)
 
 function get_message(byte1){
 	//construct Bytes for Click Events
 	const byte0 = new Buffer('11','hex');
 	const byte234 = new Buffer('00','hex');
 	const byte6 = new Buffer('0a','hex');
-	numcrc = crc.crc8(byte0,byte1,byte234,byte234,byte234)
-	//always equal 77: wrong usage for crc8 module!
-	let byte5 = new Buffer(numcrc.toString(16),'hex');
+	bytecrc = Buffer.concat([byte0,byte1,byte234,byte234,byte234]);
+	// alert(bytecrc.toString('hex'));
+	numcrc = crc.crc8(bytecrc).toString(16);
+	if (numcrc.length==1){
+		numcrc = '0'+numcrc;
+	}
+	let byte5 = new Buffer(numcrc,'hex');
 
-	// alert(byte5.toString('hex'))
-	let message = Buffer.concat([byte0,byte1,byte234,byte234,byte234,byte5,byte6]);
+	// alert(byte1.toString('hex'))
+	let message = Buffer.concat([bytecrc,byte5,byte6]);
+
 	return message;
 }
 
